@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import "./Signup.css";
 import { Link,useNavigate } from "react-router-dom";
 import img from "../../assets/images/signup.jpg";
@@ -7,10 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { signupUser } from '../../axios/instance';
 import { useSelector } from "react-redux";
 import ReactLoading from 'react-loading';
+import { passwordContext } from '../../store/Context/PasswordContextProvider';
 
 function Signup()
 {
-    const isAuthenticated = useSelector(state => state.isAuthenticated);
+    const {state}=useContext(passwordContext)
+    const {isAuthenticated}=state;
+    
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const [userData, setUserData] = useState({
@@ -23,6 +26,9 @@ function Signup()
     const handleChange = (e) =>
     {
         const { name, value } = e.target; 
+        // console.log(prevData);
+        console.log(name, value);
+        
         setUserData((prevData) =>
         {
             return {
@@ -40,8 +46,7 @@ function Signup()
         {
             console.log("usedata", userData);
             const res = await signupUser(userData);
-            
-             if (res.status === 201)
+            if (res.status === 200)
             {
                 setUserData({
                     name: "",
@@ -61,14 +66,14 @@ function Signup()
                 });
 
                 setIsLoading(false);
-                
                 navigate("/signin");
 
             }
         }
         catch (error)
         {
-            toast.error(error.response.data.error, {
+            console.log("in error of signUp.js");
+            toast.error(error, {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,

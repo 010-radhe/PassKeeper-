@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { logoutUser } from '../../axios/instance';
 import { useDispatch } from "react-redux";
 import { setAuth } from '../../redux/actions';
+import { passwordContext } from '../../store/Context/PasswordContextProvider';
 
 
 function Logout()
 {
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
+    // const dispatch = useDispatch();
+    const {setAuth}=useContext(passwordContext);
     useEffect(() =>
     {
         const logout = async () =>
@@ -19,8 +20,8 @@ function Logout()
             {
                 const res = await logoutUser();
                 if (res.status === 200)
-                {
-                    dispatch(setAuth(false));
+                { 
+                    setAuth(false);
                     navigate("/signin");
                 }
                 else

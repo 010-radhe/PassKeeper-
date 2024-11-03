@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Password from "../../Components/Password/Password";
 import "./Passwords.css";
@@ -9,35 +9,45 @@ import "react-toastify/dist/ReactToastify.css";
 import { saveNewPassword, checkAuthenticated } from "../../axios/instance";
 import { useSelector, useDispatch } from "react-redux";
 import { setAuth, setPasswords } from "../../redux/actions";
+import { passwordContext } from "../../store/Context/PasswordContextProvider";
+import axios from "axios";
 
 function Passwords() {
-  const [platform, setPlatform] = useState("");
-  const [platEmail, setPlatEmail] = useState("");
-  const [platPass, setPlatPass] = useState("");
+  const [platform, setPlatform] = useState("fara");
+  const [platEmail, setPlatEmail] = useState("gadaga@asfa");
+  const [platPass, setPlatPass] = useState("afssafa");
 
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
+ 
+  const { state,setPasswords}=useContext(passwordContext) 
+  const {isAuthenticated, name, email,passwords}=state
+// console.log("in password.js passwords ",passwords);
 
-  const { isAuthenticated, name, email, passwords } = useSelector(
-    (state) => state
-  );
-  const dispatch = useDispatch();
+
 
   const verifyUser = async () => {
     try {
       const res = await checkAuthenticated();
-      if (res.status === 200) {
-      const { passwords } = res.data;
-      dispatch(setPasswords(passwords));
+      console.log("root user ",res);
+      
+      const { password:newPasswords } = res.data;
+      console.log("new passwords are ",newPasswords);
+      
+         setPasswords(newPasswords);
       }
-    } catch (error) {
-      dispatch(setAuth(false));
+     catch (error) {
+      // setAuth(false)
       console.log(error);
     }
   };
 
   const addNewPassword = async () => {
+    debugger
+    console.log("called addnew");
+    
+    
     try {
       const data = {
         platform: platform,
@@ -45,11 +55,24 @@ function Passwords() {
         platEmail: platEmail,
         userEmail: email,
       };
+        // on success recieved complete document of user for logged in user 
+      const res = await axios({
+        url: "http://localhost:8000/addnewpassword",
+        data,
+        method: "POST",
+        withCredentials: true
 
-      const res = await saveNewPassword(data);
+      });
+      console.log("res ",res);
+      
+      
+      
       if (res.status === 200) {
-        setOpen(false);
-        verifyUser();
+      
+        // setOpen(false);
+        console.log("new passwords data saved ",res);
+        // verifyUser();
+        // setPasswords(newPasswords);
         toast.success(res.data.message, {
           position: "top-right",
           autoClose: 5000,
@@ -60,12 +83,12 @@ function Passwords() {
           progress: undefined,
         });
 
-        setPlatform("");
-        setPlatEmail("");
-        setPlatPass("");
+        // setPlatform("");
+        // setPlatEmail("");
+        // setPlatPass("");
       }
     } catch (error) {
-      toast.error(error.response.data.error, {
+      toast.error(error, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -75,13 +98,12 @@ function Passwords() {
         progress: undefined,
       });
       console.log(error);
-      console.log(error);
     }
   };
 
-  useEffect(() => {
-    !isAuthenticated && navigate("/signin", { replace: true });
-  }, [isAuthenticated, navigate]);
+  // useEffect(() => {
+  //   !isAuthenticated && navigate("/signin", { replace: true });
+  // }, [isAuthenticated, navigate]);
 
   return (
     <div className="passwords">
@@ -95,7 +117,7 @@ function Passwords() {
           Add New Password
         </button>
 
-        <Modal open={open} onClose={() => setOpen(false)}>
+        <Modal open={open}>
           <h2>Add a new password</h2>
           <form className="form">
             <div className="form__inputs">
@@ -113,7 +135,7 @@ function Passwords() {
               <label> Email </label>
               <input
                 type="email"
-                placeholder="E.g. rohitsaini@gmail.com"
+                placeholder="E.g. sham9090@gmail.com"
                 value={platEmail}
                 onChange={(e) => setPlatEmail(e.target.value)}
                 required

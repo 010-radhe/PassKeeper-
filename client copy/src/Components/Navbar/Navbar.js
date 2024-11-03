@@ -1,16 +1,18 @@
-import React, { useRef, useState } from 'react'; 
+import React, { useContext, useRef, useState } from 'react'; 
 import { FaArrowLeft } from "react-icons/fa";
 import { TiThMenuOutline } from "react-icons/ti";
  
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { useSelector } from "react-redux";
+import { passwordContext } from '../../store/Context/PasswordContextProvider';
 
 
 function Navbar()
 {
-    const isAuthenticated = useSelector(state => state.isAuthenticated);
-    const menu = useRef();
+    const {state} = useContext(passwordContext)
+    const {isAuthenticated}=state;
+     const menu = useRef();
     const [isOpen, setIsOpen] = useState(false);
 
     const handleMenu = () =>

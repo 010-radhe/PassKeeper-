@@ -3,7 +3,7 @@ const initialState = {
     name: "",
     email: "",
     passwords: []
-} 
+}
 
 const rootReducer = (state = initialState, action) =>
 {

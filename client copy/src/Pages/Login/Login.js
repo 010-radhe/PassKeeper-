@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import img from "../../assets/images/login.jpg";
@@ -6,22 +6,26 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginUser } from "../../axios/instance";
 import { useSelector, useDispatch } from "react-redux";
-import { setAuth } from "../../redux/actions";
+import { setAuth, setName, setPasswords } from "../../redux/actions";
+import { passwordContext } from "../../store/Context/PasswordContextProvider";
 
 function Login()
 {
-  const isAuthenticated = useSelector(state => state.isAuthenticated);
+  const {state,setAuth,setName,setPasswords}=useContext(passwordContext)
+ const {isAuthenticated}=state
+ console.log("login compone");
+ 
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     email: "",
     password: "",
-  });
-  const dispatch = useDispatch();
+  }); 
 
   const handleChange = (e) =>
   {
     const { name, value } = e.target;
-
+    console.log("name ",name," value ",value);
+    
     setUserData((prevData) =>
     {
       return {
@@ -35,13 +39,18 @@ function Login()
   {
     try
     {
-        //axios Throw error if response has status code other than 2XX
+      console.log("user data ",userData);
+      
       const res = await loginUser(userData);
-
+      console.log("res of log in ",res.data);
+      const {data}=res.data;
+      
+      
       if (res.status === 200)
       {
-        dispatch(setAuth(true));
-        console.log("msg ",res.data.message);
+        
+        
+        //1) this toast not showing reason: may be navigation changing 
         
         toast.success(res.data.message, {
           position: "top-right",
@@ -51,17 +60,19 @@ function Login()
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-         });
-         
-        setTimeout(() => {
-          navigate("/signup");
-      }, 5000);
+       });
+      setAuth(true);  
+      setTimeout(()=>{
+        navigate("/");
+      },2000)
+        // setPasswords(data.passwords) 
+        // console.log("data ",data.name,"pass ",data.passwords);
         
       }
-    } catch (error)
+    } 
+    catch (error)
     {
-       
-      toast.error(error.response.data.error, {
+      toast.error(error, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -70,14 +81,14 @@ function Login()
         draggable: true,
         progress: undefined,
       });
-      console.log(error);
+      console.log("error in Login.js ",error);
     }
   };
 
-  useEffect(() =>
-  {
-    isAuthenticated && navigate("/", { replace: true });
-  }, [isAuthenticated, navigate]);
+  // useEffect(() =>
+  // {
+  //   isAuthenticated && navigate("/", { replace: true });
+  // }, [isAuthenticated, navigate]);
 
   return (
     <div className="login">
@@ -140,14 +151,14 @@ function Login()
               <Link to="/signup"> Signup </Link>
             </p>
 
-            {/* <a
+            <a
               className="attr"
               href="https://www.freepik.com/vectors/star"
               target="_blank"
               rel="noreferrer"
             >
-               
-            </a> */}
+            
+            </a>
           </div>
         </div>
       </div>

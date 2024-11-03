@@ -10,6 +10,8 @@ import Login from './Pages/Login/Login';
 import Signup from './Pages/SignUp/Signup';
 import Passwords from './Pages/Passwords/Passwords';
 import Logout from './Pages/Logout/Logout';
+import PasswordContextProvider from './store/Context/PasswordContextProvider';
+
 const router=createBrowserRouter(
   createRoutesFromElements(
     <Route path='' element={<App/>}>
@@ -20,15 +22,15 @@ const router=createBrowserRouter(
       <Route path='/logout' element={<Logout/>}/> 
     </Route>
   )
-
 )
+
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router}>
-        <App />
-      </RouterProvider>
-    </Provider>
-  </React.StrictMode> 
+  // <React.StrictMode>
+      <PasswordContextProvider>
+          <RouterProvider router={router}>
+            <App />
+          </RouterProvider>
+      </PasswordContextProvider>
+    // </React.StrictMode> 
 );
 
